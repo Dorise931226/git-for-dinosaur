@@ -1,4 +1,4 @@
-//20240321
+//20240328
 //標頭檔案
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 //定義常數
 #define ROAD_LENGTH 50 //路面長度
 #define DINO_PLACE  6  //小恐龍在路面上的第幾格
-
+//結構
 struct dino {
 	char road[ROAD_LENGTH + 1];	//字串結尾需要'\0'
 	int  jump_Time_Left;		//小恐龍掉到地面的時間
@@ -78,8 +78,19 @@ bool space_pressed(void) {
 bool is_bumped(Dino* MyDinoPtr) {
 	return MyDinoPtr->jump_Time_Left == 0 && MyDinoPtr->road[DINO_PLACE] == 'X';
 }
+//隨機產生障礙物'X'
+bool spawn_barrier(Dino* MyDinoPtr) {
+	int random_Number = rand() % 100;
+	if (random_Number < MyDinoPtr->barrier_Chance) {
+		return true;
+	}
+	return false;
+}
+
 //主程式
 int main() {
+	//隨機產生種子
+	srand(time(NULL));
 	Dino* MyDinoPtr = init();
 	display(MyDinoPtr);
 	while (true) {
@@ -89,7 +100,10 @@ int main() {
 
 		if (MyDinoPtr->jump_Time_Left > 0)
 			MyDinoPtr->jump_Time_Left -= 1;
-
+		//如果要產生障礙物'X'
+		if (spawn_barrier(MyDinoPtr)) {
+			MyDinoPtr->road[ROAD_LENGTH - 1] = 'X';
+		}
 		//如果撞到我們要離開迴圈
 		if (is_bumped(MyDinoPtr)) {
 			display(MyDinoPtr);
